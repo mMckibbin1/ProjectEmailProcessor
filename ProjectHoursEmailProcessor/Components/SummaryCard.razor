@@ -1,4 +1,4 @@
-﻿<FluentCard Style="height:100%;">
+﻿<FluentCard AdditionalAttributes="Params">
     <h2>Project Summary</h2>
     @if (ProjectSummary is null)
     {
@@ -23,14 +23,14 @@
                 <dd>@(ProjectSummary.TotalHoursSubmitted?.ToString() ?? "Unable to Find Hours")</dd>
                 <dt>Total Hours Approved:</dt>
                 <dd>@(ProjectSummary.TotalHoursApproved?.ToString() ?? "Unable to Find Hours")</dd>
-                <dt>Number of Submissions:</dt>
+                <dt>Number of Emails:</dt>
                 <dd>@ProjectSummary.NumberOfSubmissions</dd>
+                <dt>Number Sent for Approval:</dt>
+                <dd>@ProjectSummary.SentForApproval</dd>
                 <dt>Number of Approved Submissions:</dt>
                 <dd>@ProjectSummary.ApprovedSubmissions</dd>
                 <dt>Number of Rejected Submissions:</dt>
                 <dd>@ProjectSummary.RejectedSubmissions</dd>
-                <dt>Number Sent for Approval:</dt>
-                <dd>@ProjectSummary.SentForApproval</dd>
             </dl>
         }
     }
@@ -39,4 +39,7 @@
 @code {
     [Parameter, EditorRequired]
     public ProjectSummary? ProjectSummary { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object?>? Params { get; set; } 
 }
