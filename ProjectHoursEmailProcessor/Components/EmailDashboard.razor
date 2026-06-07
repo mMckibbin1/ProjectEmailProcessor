@@ -12,6 +12,7 @@
                                     TOption="string"
                                     TValue="string"
                                     Items="@mentorNames"
+                                    Required="true"
                                     @ref="mentorNameCombobox"
                                     @bind-Value="@selectedMentorName">
                     </FluentCombobox>
@@ -23,17 +24,20 @@
                                     TOption="string"
                                     TValue="string"
                                     Items="@businessNames"
+                                    Required="true"
                                     @ref="businessNameCombobox"
                                     @bind-Value="@selectedBusinessName">
                     </FluentCombobox>
                 </div>
                 <div>
                     <FluentDatePicker Label="Days view"
+                                      Required="true"
                                       @bind-Value="@startDate"
                                       RenderStyle="DatePickerRenderStyle.Native" />
                 </div>
                 <div>
                     <FluentDatePicker Label="Days view"
+                                      Required="true"
                                       @bind-Value="@endDate"
                                       RenderStyle="DatePickerRenderStyle.Native" />
                 </div>
