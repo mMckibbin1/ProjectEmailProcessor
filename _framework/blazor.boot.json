@@ -1,10 +1,10 @@
 {
   "mainAssemblyName": "ProjectHoursEmailProcessor",
   "resources": {
-    "hash": "sha256-8Yp0865wvmGM7HBQbEZJ2AS10wxTzUx+V6kKA3E+dAk=",
+    "hash": "sha256-6vUczZaFY2YZga/+IOXquNadOgPWgf5GfbwMNUC3Dgo=",
     "fingerprinting": {
       "CsvHelper.4zhysgmj1f.wasm": "CsvHelper.wasm",
-      "EmailParser.hgjg7c4ojb.wasm": "EmailParser.wasm",
+      "EmailParser.db498kcn3i.wasm": "EmailParser.wasm",
       "Microsoft.AspNetCore.Components.Forms.bksjjcshxs.wasm": "Microsoft.AspNetCore.Components.Forms.wasm",
       "Microsoft.AspNetCore.Components.Web.jr7u0fzsd7.wasm": "Microsoft.AspNetCore.Components.Web.wasm",
       "Microsoft.AspNetCore.Components.WebAssembly.p8u7kzgi7p.wasm": "Microsoft.AspNetCore.Components.WebAssembly.wasm",
@@ -24,7 +24,7 @@
       "Microsoft.FluentUI.AspNetCore.Components.b9mhuuy92b.wasm": "Microsoft.FluentUI.AspNetCore.Components.wasm",
       "Microsoft.JSInterop.WebAssembly.7kgosuwcp1.wasm": "Microsoft.JSInterop.WebAssembly.wasm",
       "Microsoft.JSInterop.cxiw1bjkul.wasm": "Microsoft.JSInterop.wasm",
-      "ProjectHoursEmailProcessor.04glkup3vd.wasm": "ProjectHoursEmailProcessor.wasm",
+      "ProjectHoursEmailProcessor.x89p1mjeen.wasm": "ProjectHoursEmailProcessor.wasm",
       "System.Collections.Concurrent.v7jw3dwq3c.wasm": "System.Collections.Concurrent.wasm",
       "System.Collections.Immutable.o322de6few.wasm": "System.Collections.Immutable.wasm",
       "System.Collections.NonGeneric.hnxmd4f0cm.wasm": "System.Collections.NonGeneric.wasm",
@@ -91,7 +91,7 @@
     },
     "assembly": {
       "CsvHelper.4zhysgmj1f.wasm": "sha256-gIv3rkSTS7t+R5bMtcyMpbn3EuECRPgHZmWECRjdcd4=",
-      "EmailParser.hgjg7c4ojb.wasm": "sha256-gR1wcLISSohvMQNqUxAvHq12b/S0SV3DmPcef7mS1jw=",
+      "EmailParser.db498kcn3i.wasm": "sha256-5ymQvCh7tUu0NTM8M2YJ1pCBZxLWeL1NfM7H1Nk+3j8=",
       "Microsoft.AspNetCore.Components.Forms.bksjjcshxs.wasm": "sha256-W7odoMSR4VcUjjG/FDKFdO9NWPsxrkJvNmsABbttKFk=",
       "Microsoft.AspNetCore.Components.Web.jr7u0fzsd7.wasm": "sha256-z06834KDTEI/GRrbcDXdKv4m/+9sld8zm1a7jSQtH1E=",
       "Microsoft.AspNetCore.Components.WebAssembly.p8u7kzgi7p.wasm": "sha256-J+uYkkRKQXzYM+zun60aPPukq8cw61TDOL5ROtLPE7U=",
@@ -111,7 +111,7 @@
       "Microsoft.FluentUI.AspNetCore.Components.b9mhuuy92b.wasm": "sha256-Ef9kQt4YyebVydzkxptZ+nyWK4GQ40YqRXJ51PpeGr0=",
       "Microsoft.JSInterop.WebAssembly.7kgosuwcp1.wasm": "sha256-1z0Y84uA00IAzAva6NfY90YxANhO6f90X2ikR37z3xI=",
       "Microsoft.JSInterop.cxiw1bjkul.wasm": "sha256-0ARz77+mXxEntyYkNvS/oN4VuS2WuBK6Y+5gNmFifkA=",
-      "ProjectHoursEmailProcessor.04glkup3vd.wasm": "sha256-0GDFR7cbof8d63zKO9TM8+2l05JaIYw+Ft97Z6LUuNA=",
+      "ProjectHoursEmailProcessor.x89p1mjeen.wasm": "sha256-75u6T4O0cuiS3kppwa2HCmVcoS9BK05UyjTjWUqBoz0=",
       "System.Collections.Concurrent.v7jw3dwq3c.wasm": "sha256-tR+KGalm5MvVOM0n0AZZza7fGg+X4VBdVWpI6GCpTIU=",
       "System.Collections.Immutable.o322de6few.wasm": "sha256-3EOejpJuHpS9SLFLFolRfJj8JPJJklW+V0uG3sl5HR8=",
       "System.Collections.NonGeneric.hnxmd4f0cm.wasm": "sha256-3QDujcoB5BpwVrn5unBB1aHdzUiQtjUnHSyrxyEeJk4=",
