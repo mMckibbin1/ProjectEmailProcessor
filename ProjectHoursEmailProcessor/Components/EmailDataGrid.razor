@@ -11,15 +11,15 @@
     <TemplateColumn Title="Email Type" Sortable="true" SortBy="emailTypeSort">
         @if(context.EmailType == EmailType.Approval)
         {
-            <FluentIcon Value="new Icons.Filled.Size20.QuestionCircle()" Color="Color.Info" Title="Sent for Approval" />
+            <FluentIcon Value="new Icons.Filled.Size28.QuestionCircle()" Color="Color.Info" Title="Sent for Approval" />
         }
         else if (context.EmailType == EmailType.Approved)
         {
-            <FluentIcon Value="new Icons.Filled.Size20.CheckmarkCircle()" Color="Color.Success" Title="Hours Approved" />
+            <FluentIcon Value="new Icons.Filled.Size28.CheckmarkCircle()" Color="Color.Success" Title="Hours Approved" />
         }
         else
         {
-            <FluentIcon Value="new Icons.Filled.Size20.DismissCircle()" Color="Color.Error" Title="Hours Rejected" />
+            <FluentIcon Value="new Icons.Filled.Size28.DismissCircle()" Color="Color.Error" Title="Hours Rejected" />
         }
     </TemplateColumn>
 </FluentDataGrid>
