@@ -8,11 +8,11 @@
     <span style="color: var(--colorNeutralForegroundOnBrand); font-size:@(StylesVariables.Fonts.Size.Base500); font-weight:@(StylesVariables.Fonts.Weight.Bold)">
         Project Email Processor
     </span>
-    @if(aggregatedEmailData is not null)
+    @if (aggregatedEmailData is not null)
     {
         <FluentButton @onclick="Reset">Upload Different File</FluentButton>
     }
-    
+
 </div>
 <div class="page-container">
     @if (aggregatedEmailData is null)
@@ -65,7 +65,14 @@
         isProcessing = true;
         Debug.Assert(stream is not null);
 
-        aggregatedEmailData = await EmailDataParser.ParseAsync(stream);
+        try
+        {
+            aggregatedEmailData = await EmailDataParser.ParseAsync(stream);
+        }
+        catch (Exception ex)
+        {
+            await DispatchExceptionAsync(ex);
+        }
 
         isProcessing = false;
         progressPercent = 0;

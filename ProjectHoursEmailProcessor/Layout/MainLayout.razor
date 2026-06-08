@@ -1,7 +1,14 @@
 ﻿@inherits LayoutComponentBase
 <div>
     <main>
-        @Body
+        <FluentErrorBoundary>
+            <ChildContent>
+                @Body
+            </ChildContent>
+            @* <ErrorContent>
+                Fuck
+            </ErrorContent> *@
+        </FluentErrorBoundary>
     </main>
 </div>
 
