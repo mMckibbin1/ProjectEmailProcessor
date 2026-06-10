@@ -54,11 +54,6 @@ public sealed class ProjectSummary(
             return approvedHoursEmails[0].ClientName;
         }
 
-        if (sentForApprovalEmails.Count > 0)
-        {
-            return null;
-        }
-
         if (rejectionEmails.Count > 0)
         {
             return rejectionEmails[0].BusinessClientName;

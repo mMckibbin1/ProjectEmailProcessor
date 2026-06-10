@@ -1,38 +1,98 @@
-﻿<FluentDataGrid Items="@Emails" Pagination="@pagination" RowSize="DataGridRowSize.Medium" StripedRows="true">
-    <PropertyColumn Property="@(p => p.BusinessName)" Title="Business Name" Sortable="true" />
-    <TemplateColumn Title="Client Name" Sortable="true" SortBy="@clientNameSort">
-        @(context.ClientName ?? "N/A")
-    </TemplateColumn>
-    <PropertyColumn Property="@(p => p.MentorName)" Title="Mentor Name" Sortable="true" />
-    <PropertyColumn Property="@(p => p.SessionDate)" Title="Session Date" Format="yyyy-MM-dd" Sortable="true" IsDefaultSortColumn="true" InitialSortDirection="DataGridSortDirection.Descending" />
-    <TemplateColumn Title="Completed Hours" Sortable="true" SortBy="@completedHoursSort">
-        @(context.CompletedHours?.ToString() ?? "N/A")
-    </TemplateColumn>
-    <TemplateColumn Title="Email Type" Sortable="true" SortBy="emailTypeSort">
-        @if(context.EmailType == EmailType.Approval)
-        {
-            <FluentIcon Value="new Icons.Filled.Size28.QuestionCircle()" Color="Color.Info" Title="Sent for Approval" />
-        }
-        else if (context.EmailType == EmailType.Approved)
-        {
-            <FluentIcon Value="new Icons.Filled.Size28.CheckmarkCircle()" Color="Color.Success" Title="Hours Approved" />
-        }
-        else
-        {
-            <FluentIcon Value="new Icons.Filled.Size28.DismissCircle()" Color="Color.Error" Title="Hours Rejected" />
-        }
-    </TemplateColumn>
-</FluentDataGrid>
+﻿<FluentCard>
+    <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.SpaceBetween">
+        <h2>Search For a Project</h2>
+        <div>
+            <FluentSelect Label="Emails Type Filter"
+                          Placeholder="No emails types selected"
+                          Items="@emailTypeOptions"
+                          TOption="EmailSelect"
+                          TValue="EmailType"
+                          OptionText="(o => o.DisplayName)"
+                          OptionValue="o => o.EmailType"
+                          @bind-SelectedItems="@selectedEmailTypes"
+                          @bind-SelectedItems:after="SetFilteredGridItems"
+                          Multiple="true" />
+        </div>
+    </FluentStack>
+    <FluentDataGrid Items="@filteredGridItems" Pagination="@pagination" RowSize="DataGridRowSize.Medium" StripedRows="true">
+        <PropertyColumn Property="@(p => p.BusinessName)" Title="Business Name" Sortable="true" />
+        <TemplateColumn Title="Client Name" Sortable="true" SortBy="@clientNameSort">
+            @(context.ClientName ?? "N/A")
+        </TemplateColumn>
+        <PropertyColumn Property="@(p => p.MentorName)" Title="Mentor Name" Sortable="true" />
+        <PropertyColumn Property="@(p => p.SessionDate)" Title="Session Date" Format="yyyy-MM-dd" Sortable="true" IsDefaultSortColumn="true" InitialSortDirection="DataGridSortDirection.Descending" />
+        <TemplateColumn Title="Completed Hours" Sortable="true" SortBy="@completedHoursSort">
+            @(context.CompletedHours?.ToString() ?? "N/A")
+        </TemplateColumn>
+        <TemplateColumn Title="Email Type" Sortable="true" SortBy="emailTypeSort">
+            @if (context.EmailType == EmailType.Approval)
+            {
+                <FluentIcon Value="new Icons.Filled.Size28.QuestionCircle()" Color="Color.Info" Title="Sent for Approval" />
+            }
+            else if (context.EmailType == EmailType.Approved)
+            {
+                <FluentIcon Value="new Icons.Filled.Size28.CheckmarkCircle()" Color="Color.Success" Title="Hours Approved" />
+            }
+            else
+            {
+                <FluentIcon Value="new Icons.Filled.Size28.DismissCircle()" Color="Color.Error" Title="Hours Rejected" />
+            }
+        </TemplateColumn>
+    </FluentDataGrid>
 
-<FluentPaginator State="@pagination" />
+    <FluentPaginator State="@pagination" />
+</FluentCard>
+
+
+
 
 @code {
     [Parameter, EditorRequired]
-    public IQueryable<EmailGridItem> Emails { get; set; }
+    public IEnumerable<EmailGridItem> GridItems { get; set; }
 
     private readonly PaginationState pagination = new PaginationState() { ItemsPerPage = 30 };
 
     private static readonly GridSort<EmailGridItem> clientNameSort = GridSort<EmailGridItem>.ByAscending(x => x.ClientName);
     private static readonly GridSort<EmailGridItem> completedHoursSort = GridSort<EmailGridItem>.ByAscending(x => x.CompletedHours);
     private static readonly GridSort<EmailGridItem> emailTypeSort = GridSort<EmailGridItem>.ByAscending(x => x.EmailType);
+
+    private IEnumerable<EmailSelect> selectedEmailTypes = emailTypeOptions;
+
+    private static readonly EmailSelect[] emailTypeOptions =
+    [
+        EmailSelect.Approved,
+        EmailSelect.Rejected,
+        EmailSelect.Approval
+    ];
+
+    private IQueryable<EmailGridItem> filteredGridItems = null!;
+
+    private void SetFilteredGridItems()
+    {
+        filteredGridItems = GridItems
+            .Where(x => selectedEmailTypes.Any(et => et.EmailType == x.EmailType))
+            .ToList()
+            .AsQueryable();
+    }
+
+    protected override void OnParametersSet()
+    {
+        SetFilteredGridItems();
+    }
+
+    // private IQueryable<EmailGridItem> FilteredGridItems => GridItems
+    //     .Where(x => selectedEmailTypes.Any(et => et.EmailType == x.EmailType))
+    //     .AsQueryable();
+
+    private sealed record EmailSelect
+    {
+        public required string DisplayName { get; init; }
+        public required EmailType EmailType { get; init; }
+
+        private EmailSelect() { }
+
+        public static readonly EmailSelect Approved = new() { DisplayName = EmailType.Approved.ToString(), EmailType = EmailType.Approved };
+        public static readonly EmailSelect Rejected = new() { DisplayName = EmailType.Rejected.ToString(), EmailType = EmailType.Rejected };
+        public static readonly EmailSelect Approval = new() { DisplayName = EmailType.Approval.ToString(), EmailType = EmailType.Approval };
+    }
 }
