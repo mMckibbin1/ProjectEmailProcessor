@@ -1,6 +1,6 @@
 ﻿<FluentCard>
     <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.SpaceBetween">
-        <h2>Search For a Project</h2>
+        <h2>Emails</h2>
         <div>
             <FluentSelect Label="Emails Type Filter"
                           Placeholder="No emails types selected"
@@ -43,9 +43,6 @@
     <FluentPaginator State="@pagination" />
 </FluentCard>
 
-
-
-
 @code {
     [Parameter, EditorRequired]
     public IEnumerable<EmailGridItem> GridItems { get; set; }
@@ -79,10 +76,6 @@
     {
         SetFilteredGridItems();
     }
-
-    // private IQueryable<EmailGridItem> FilteredGridItems => GridItems
-    //     .Where(x => selectedEmailTypes.Any(et => et.EmailType == x.EmailType))
-    //     .AsQueryable();
 
     private sealed record EmailSelect
     {
