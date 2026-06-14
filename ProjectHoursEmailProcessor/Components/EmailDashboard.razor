@@ -42,12 +42,11 @@
                                       RenderStyle="DatePickerRenderStyle.Native" />
                 </div>
                 <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="8px">
-                    <FluentButton Type="ButtonType.Button" Disabled="disableSubmit" Appearance="ButtonAppearance.Primary" @onclick="Filter">Submit</FluentButton>
-                    <FluentButton Type="ButtonType.Button" Appearance="ButtonAppearance.Outline" @onclick="RestFilter">Reset</FluentButton>
+                    <FluentButton Type="ButtonType.Button" Disabled="disableSubmit" Appearance="ButtonAppearance.Primary" Loading="filtering" @onclick="Filter">Submit</FluentButton>
+                    <FluentButton Type="ButtonType.Button" Appearance="ButtonAppearance.Outline" Disabled="filtering" @onclick="RestFilter">Reset</FluentButton>
                 </FluentStack>
             </FluentStack>
         </FluentCard>
-
     </section>
     <section class="top-right">
         <SummaryCard ProjectSummary="projectSummary" style="height:100%;" />
@@ -79,6 +78,8 @@
 
     private IEnumerable<EmailGridItem> emails = default!;
 
+    private bool filtering;
+
     protected override void OnParametersSet()
     {
         Debug.Assert(AggregatedEmailData is not null);
@@ -104,11 +105,14 @@
             .ToList();
 
         DisplayAllEmails();
-
     }
 
-    private void Filter()
+    private async Task Filter()
     {
+        filtering = true;
+        StateHasChanged();
+        var delay = Task.Delay(300);
+
         var approved = AggregatedEmailData.ApprovedHoursEmails.Where(x => x.BusinessName.Equals(selectedBusinessName, StringComparison.CurrentCultureIgnoreCase) &&
         x.MentorName.Equals(selectedMentorName, StringComparison.CurrentCultureIgnoreCase) && (x.SessionDate >= startDate && x.SessionDate <= endDate)).ToList();
 
@@ -118,6 +122,8 @@
         var rejected = AggregatedEmailData.RejectionEmails.Where(x => x.BusinessName.Equals(selectedBusinessName, StringComparison.CurrentCultureIgnoreCase) &&
         x.MentorName.Equals(selectedMentorName, StringComparison.CurrentCultureIgnoreCase) && (x.SessionDate >= startDate && x.SessionDate <= endDate)).ToList();
 
+        await delay;
+
         projectSummary = new(approvedHoursEmails: approved,
         sentForApprovalEmails: sent,
         rejectionEmails: rejected);
@@ -125,6 +131,8 @@
         emails = approved.Select(x => EmailGridItem.FromEmail(x))
             .Concat(sent.Select(x => EmailGridItem.FromEmail(x)))
             .Concat(rejected.Select(x => EmailGridItem.FromEmail(x)));
+
+        filtering = false;
     }
 
     private void RestFilter()
