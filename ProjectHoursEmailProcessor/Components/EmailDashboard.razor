@@ -42,8 +42,8 @@
                                       RenderStyle="DatePickerRenderStyle.Native" />
                 </div>
                 <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="8px">
-                    <FluentButton Type="ButtonType.Button" Disabled="disableSubmit" Appearance="ButtonAppearance.Primary" Loading="filtering" @onclick="Filter">Submit</FluentButton>
-                    <FluentButton Type="ButtonType.Button" Appearance="ButtonAppearance.Outline" Disabled="filtering" @onclick="RestFilter">Reset</FluentButton>
+                    <FluentButton Type="ButtonType.Button" Disabled="disableSubmit" Appearance="ButtonAppearance.Primary" Loading="isFiltering" @onclick="Filter">Submit</FluentButton>
+                    <FluentButton Type="ButtonType.Button" Appearance="ButtonAppearance.Outline" Disabled="isFiltering" @onclick="RestFilter">Reset</FluentButton>
                 </FluentStack>
             </FluentStack>
         </FluentCard>
@@ -73,12 +73,10 @@
     private DateOnly? endDate;
 
     private bool disableSubmit => selectedBusinessName is null || selectedMentorName is null || startDate is null || endDate is null;
+    private bool isFiltering;
 
     private ProjectSummary? projectSummary;
-
     private IEnumerable<EmailGridItem> emails = default!;
-
-    private bool filtering;
 
     protected override void OnParametersSet()
     {
@@ -109,7 +107,7 @@
 
     private async Task Filter()
     {
-        filtering = true;
+        isFiltering = true;
         StateHasChanged();
         var delay = Task.Delay(300);
 
@@ -132,7 +130,7 @@
             .Concat(sent.Select(x => EmailGridItem.FromEmail(x)))
             .Concat(rejected.Select(x => EmailGridItem.FromEmail(x)));
 
-        filtering = false;
+        isFiltering = false;
     }
 
     private void RestFilter()
@@ -153,6 +151,6 @@
     {
         emails = AggregatedEmailData.ApprovedHoursEmails.Select(x => EmailGridItem.FromEmail(x))
             .Concat(AggregatedEmailData.RejectionEmails.Select(x => EmailGridItem.FromEmail(x)))
-            .Concat(AggregatedEmailData.SentForApprovalEmails.Select(x => EmailGridItem.FromEmail(x))).AsQueryable();
+            .Concat(AggregatedEmailData.SentForApprovalEmails.Select(x => EmailGridItem.FromEmail(x)));
     }
 }
