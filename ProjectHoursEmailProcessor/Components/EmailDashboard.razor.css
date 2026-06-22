@@ -7,8 +7,8 @@
     "bottom bottom";
   min-height: 100vh;
   gap:16px;
-  overflow-y: auto;
-  margin-bottom: 8px;
+  overflow-y: hidden;
+  margin-bottom: 16px;
 }
 
 .top-left {

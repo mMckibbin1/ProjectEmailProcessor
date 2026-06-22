@@ -48,7 +48,15 @@
     }
     else
     {
-        <EmailDashboard AggregatedEmailData="aggregatedEmailData" />
+        <FluentTabs Appearance="TabsAppearance.Subtle" Size="TabsSize.Large">
+            <FluentTab Id="dashboard" Header="Projects" IconStart="new Icons.Filled.Size24.Person()">
+                <EmailDashboard AggregatedEmailData="aggregatedEmailData" />
+            </FluentTab>
+            <FluentTab Id="statistics" Header="Mentor Statistics" IconStart="new Icons.Filled.Size24.DataArea()">
+                <StatisticsDashboard AggregatedEmailData="aggregatedEmailData" />
+            </FluentTab>
+        </FluentTabs>
+        
     }
 </div>
 

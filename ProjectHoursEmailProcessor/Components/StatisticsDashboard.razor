@@ -1,0 +1,82 @@
+﻿@using System.Diagnostics
+
+<FluentCard>
+    <h2>Statistics</h2>
+    <FluentDataGrid Items="items" RowSize="DataGridRowSize.Small" StripedRows="true">
+        <PropertyColumn Property="p => p.MentorName" Title="Mentor Name" Sortable="true" IsDefaultSortColumn="true" />
+        <PropertyColumn Property="p => p.AverageSessionLength" Title="Average Session Length (Hours)" Sortable="true" />
+        <PropertyColumn Property="p => p.AverageSessionsPerBusiness" Title="Average Sessions Per Business" Sortable="true" />
+        <PropertyColumn Property="p => p.TotalNumberOfApprovedSessions" Title="Total Number Of Approved Sessions" Sortable="true" />
+        <PropertyColumn Property="p => p.TotalHoursApproved" Title="Total Hours Approved" Sortable="true" />
+        <PropertyColumn Property="p => p.NumberOfBusinesses" Title="Total Number Of Businesses" Sortable="true" />
+    </FluentDataGrid>
+</FluentCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public AggregatedEmailData AggregatedEmailData { get; set; }
+    private AggregatedEmailData? _prevAggregatedEmailData;
+
+    private IQueryable<MentorStatistics> items = default!;
+
+    protected override void OnParametersSet()
+    {
+        Debug.Assert(AggregatedEmailData is not null);
+        if (_prevAggregatedEmailData == AggregatedEmailData)
+        {
+            return;
+        }
+
+        _prevAggregatedEmailData = AggregatedEmailData;
+
+        items = AggregatedEmailData.ApprovedHoursEmails
+            .GroupBy(x => x.MentorName, StringComparer.CurrentCultureIgnoreCase)
+            .Select(x => new MentorStatistics(x, x.Key))
+            .OrderBy(x => x.MentorName)
+            .ToList()
+            .AsQueryable();
+    }
+
+    private sealed class MentorStatistics
+    {
+        public IEnumerable<ApprovedHoursEmail> ApprovedHoursEmails { get; private set; }
+        public string MentorName { get; private set; }
+        public int NumberOfBusinesses { get; }
+        public int TotalNumberOfApprovedSessions => ApprovedHoursEmails.Count();
+        public double AverageSessionsPerBusiness { get; }
+        public double AverageSessionLength { get; }
+        public double TotalHoursApproved { get; }
+
+        public MentorStatistics(IEnumerable<ApprovedHoursEmail> approvedHoursEmails, string mentorName)
+        {
+            ApprovedHoursEmails = approvedHoursEmails;
+            MentorName = mentorName;
+            NumberOfBusinesses = GetNumberOfBusinesses(approvedHoursEmails);
+            AverageSessionsPerBusiness = GetAverageNumberSessionsPerBusiness(approvedHoursEmails);
+            AverageSessionLength = GetAverageSessionLength(approvedHoursEmails);
+            TotalHoursApproved = approvedHoursEmails.Sum(x => x.CompletedHours);
+        }
+
+        private static int GetNumberOfBusinesses(IEnumerable<ApprovedHoursEmail> aggregatedEmailData)
+        {
+            return aggregatedEmailData
+                .DistinctBy(x => x.BusinessName, StringComparer.CurrentCultureIgnoreCase)
+                .Count();
+        }
+
+        private static double GetAverageNumberSessionsPerBusiness(IEnumerable<ApprovedHoursEmail> aggregatedEmailData)
+        {
+            var average = aggregatedEmailData
+                .GroupBy(x => x.BusinessName)
+                .Average(g => g.Count());
+
+            return Math.Round(average, 1, MidpointRounding.AwayFromZero);
+        }
+
+        private static double GetAverageSessionLength(IEnumerable<ApprovedHoursEmail> aggregatedEmailData)
+        {
+            var average = aggregatedEmailData.Average(x => x.CompletedHours);
+            return Math.Round(average, 1, MidpointRounding.AwayFromZero);
+        }
+    }
+}
