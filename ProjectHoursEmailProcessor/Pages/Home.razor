@@ -50,13 +50,13 @@
         <FluentTabs Appearance="TabsAppearance.Subtle" Size="TabsSize.Large" @bind-ActiveTabId="activeTabId">
             <FluentTab Id="@DashboardTabId"
                        Header="Projects"
-                       IconStart="new Icons.Filled.Size24.Person()"
+                       IconStart="new Icons.Filled.Size24.DataArea()"
                        IconColor="activeTabId == DashboardTabId ? Color.Primary : null">
                 <EmailDashboard AggregatedEmailData="aggregatedEmailData" />
             </FluentTab>
             <FluentTab Id="@StatisticsTabId"
                        Header="Mentor Statistics"
-                       IconStart="new Icons.Filled.Size24.DataArea()"
+                       IconStart="new Icons.Filled.Size24.Person()"
                        IconColor="activeTabId == StatisticsTabId ? Color.Primary : null">
                 <StatisticsDashboard AggregatedEmailData="aggregatedEmailData" />
             </FluentTab>
