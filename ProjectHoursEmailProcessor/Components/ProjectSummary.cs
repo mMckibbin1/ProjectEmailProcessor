@@ -1,4 +1,5 @@
 ﻿using EmailParser;
+using ProjectHoursEmailProcessor.Extensions;
 
 namespace ProjectHoursEmailProcessor.Components;
 
@@ -11,9 +12,9 @@ public sealed class ProjectSummary(
         sentForApprovalEmails.Count +
         rejectionEmails.Count) > 0;
 
-    public string? BusinessName => GetBusinessName();
-    public string? ClientName => GetClientName();
-    public string? MentorName => GetMentorName();
+    public string? BusinessName => GetBusinessName()?.ToCapitaliseEachWord();
+    public string? ClientName => GetClientName()?.ToCapitaliseEachWord();
+    public string? MentorName => GetMentorName()?.ToCapitaliseEachWord();
     public double? TotalHoursSubmitted => GetTotalHoursSubmitted();
     public double? TotalHoursApproved => GetTotalHoursApproved();
 

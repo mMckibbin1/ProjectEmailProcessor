@@ -92,6 +92,7 @@
                                         .Concat(AggregatedEmailData.RejectionEmails.Select(x => x.MentorName))
                                         .Concat(AggregatedEmailData.SentForApprovalEmails.Select(x => x.MentorName))
                                         .Distinct(StringComparer.CurrentCultureIgnoreCase)
+                                        .Select(n => n.ToCapitaliseEachWord())
                                         .Order()
                                         .ToList();
 
@@ -99,6 +100,7 @@
             .Concat(AggregatedEmailData.RejectionEmails.Select(x => x.BusinessName))
             .Concat(AggregatedEmailData.SentForApprovalEmails.Select(x => x.BusinessName))
             .Distinct(StringComparer.CurrentCultureIgnoreCase)
+            .Select(n => n.ToCapitaliseEachWord())
             .Order()
             .ToList();
 

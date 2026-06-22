@@ -10,7 +10,6 @@
     {
         <FluentButton @onclick="Reset">Upload Different File</FluentButton>
     }
-
 </div>
 <div class="page-container">
     @if (aggregatedEmailData is null)
@@ -48,15 +47,20 @@
     }
     else
     {
-        <FluentTabs Appearance="TabsAppearance.Subtle" Size="TabsSize.Large">
-            <FluentTab Id="dashboard" Header="Projects" IconStart="new Icons.Filled.Size24.Person()">
+        <FluentTabs Appearance="TabsAppearance.Subtle" Size="TabsSize.Large" @bind-ActiveTabId="activeTabId">
+            <FluentTab Id="@DashboardTabId"
+                       Header="Projects"
+                       IconStart="new Icons.Filled.Size24.Person()"
+                       IconColor="activeTabId == DashboardTabId ? Color.Primary : null">
                 <EmailDashboard AggregatedEmailData="aggregatedEmailData" />
             </FluentTab>
-            <FluentTab Id="statistics" Header="Mentor Statistics" IconStart="new Icons.Filled.Size24.DataArea()">
+            <FluentTab Id="@StatisticsTabId"
+                       Header="Mentor Statistics"
+                       IconStart="new Icons.Filled.Size24.DataArea()"
+                       IconColor="activeTabId == StatisticsTabId ? Color.Primary : null">
                 <StatisticsDashboard AggregatedEmailData="aggregatedEmailData" />
             </FluentTab>
         </FluentTabs>
-        
     }
 </div>
 
@@ -64,6 +68,11 @@
     private bool isProcessing;
     private AggregatedEmailData? aggregatedEmailData;
     private int progressPercent = 0;
+
+    private const string DashboardTabId = "dashboard";
+    private const string StatisticsTabId = "statistics";
+
+    private string activeTabId = DashboardTabId;
 
     private async Task OnFileUpLoaded(FluentInputFileEventArgs args)
     {

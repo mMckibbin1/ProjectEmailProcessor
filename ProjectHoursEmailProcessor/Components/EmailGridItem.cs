@@ -1,4 +1,5 @@
 ﻿using EmailParser;
+using ProjectHoursEmailProcessor.Extensions;
 
 namespace ProjectHoursEmailProcessor.Components;
 
@@ -17,10 +18,10 @@ public sealed class EmailGridItem
     {
         return new()
         {
-            BusinessName = email.BusinessName,
+            BusinessName = email.BusinessName.ToCapitaliseEachWord(),
             ClientName = null,
             CompletedHours = email.HoursCompleted,
-            MentorName = email.MentorName,
+            MentorName = email.MentorName.ToCapitaliseEachWord(),
             SessionDate = email.SessionDate,
             EmailType = EmailType.Approval
         };
@@ -30,10 +31,10 @@ public sealed class EmailGridItem
     {
         return new()
         {
-            BusinessName = email.BusinessName,
+            BusinessName = email.BusinessName.ToCapitaliseEachWord(),
             ClientName = email.ClientName,
             CompletedHours = email.CompletedHours,
-            MentorName = email.MentorName,
+            MentorName = email.MentorName.ToCapitaliseEachWord(),
             SessionDate = email.SessionDate,
             EmailType = EmailType.Approved
         };
@@ -43,10 +44,10 @@ public sealed class EmailGridItem
     {
         return new()
         {
-            BusinessName = email.BusinessName,
+            BusinessName = email.BusinessName.ToCapitaliseEachWord(),
             ClientName = email.BusinessClientName,
             CompletedHours = null,
-            MentorName = email.MentorName,
+            MentorName = email.MentorName.ToCapitaliseEachWord(),
             SessionDate = email.SessionDate,
             EmailType = EmailType.Rejected
         };
