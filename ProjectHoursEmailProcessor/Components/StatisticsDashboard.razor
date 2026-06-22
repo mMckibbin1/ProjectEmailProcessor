@@ -1,7 +1,24 @@
 ﻿@using System.Diagnostics
 
 <FluentCard>
-    <h2>Statistics</h2>
+    <FluentStack Orientation="Orientation.Vertical">
+        <h2 style="margin-bottom:0px">Statistics</h2>
+        <FluentStack Orientation="Orientation.Horizontal" Wrap="true" HorizontalGap="8px">
+            <div>
+                <FluentDatePicker Label="Start Date"
+                                  @bind-Value="@startDate"
+                                  @bind-Value:after="SetFilterItems"
+                                  RenderStyle="DatePickerRenderStyle.Native" />
+            </div>
+            <div>
+                <FluentDatePicker Label="End Date"
+                                  @bind-Value="@endDate"
+                                  @bind-Value:after="SetFilterItems"
+                                  RenderStyle="DatePickerRenderStyle.Native" />
+            </div>
+        </FluentStack>
+    </FluentStack>
+
     <FluentDataGrid Items="items" RowSize="DataGridRowSize.Small" StripedRows="true">
         <PropertyColumn Property="p => p.MentorName" Title="Mentor Name" Sortable="true" IsDefaultSortColumn="true" />
         <PropertyColumn Property="p => p.AverageSessionLength" Title="Average Session Length (Hours)" Sortable="true" />
@@ -19,6 +36,9 @@
 
     private IQueryable<MentorStatistics> items = default!;
 
+    private DateOnly? startDate;
+    private DateOnly? endDate;
+
     protected override void OnParametersSet()
     {
         Debug.Assert(AggregatedEmailData is not null);
@@ -29,8 +49,24 @@
 
         _prevAggregatedEmailData = AggregatedEmailData;
 
-        items = AggregatedEmailData.ApprovedHoursEmails
-            .GroupBy(x => x.MentorName, StringComparer.CurrentCultureIgnoreCase)
+        SetFilterItems();
+    }
+
+    private void SetFilterItems()
+    {
+        IEnumerable<ApprovedHoursEmail> approvedHoursEmails = AggregatedEmailData.ApprovedHoursEmails;
+
+        if (startDate.HasValue)
+        {
+            approvedHoursEmails = approvedHoursEmails.Where(x => x.SessionDate >= startDate);
+        }
+
+        if (endDate.HasValue)
+        {
+            approvedHoursEmails = approvedHoursEmails.Where(x => x.SessionDate <= endDate);
+        }
+
+        items = approvedHoursEmails.GroupBy(x => x.MentorName, StringComparer.CurrentCultureIgnoreCase)
             .Select(x => new MentorStatistics(x, x.Key))
             .OrderBy(x => x.MentorName)
             .ToList()
