@@ -10,8 +10,8 @@
     "bottom bottom";
   min-height: 100vh;
   gap:16px;
-  overflow-y: auto;
-  margin-bottom: 8px;
+  overflow-y: hidden;
+  margin-bottom: 16px;
 }
 
 .top-left[b-eigayrj591] {
@@ -24,6 +24,20 @@
 
 .bottom[b-eigayrj591] {
   grid-area: bottom;
+}
+/* /Components/StatisticsDashboard.razor.rz.scp.css */
+dl[b-mchu1ajkqy] {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 12px;
+}
+
+dt[b-mchu1ajkqy] {
+    font-weight: bold;
+}
+
+dd[b-mchu1ajkqy] {
+    margin: 0;
 }
 /* /Components/SummaryCard.razor.rz.scp.css */
 dl[b-7ydmhes0r5] {
