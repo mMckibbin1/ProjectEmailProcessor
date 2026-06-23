@@ -16,6 +16,17 @@
                                   @bind-Value:after="SetFilterItems"
                                   RenderStyle="DatePickerRenderStyle.Native" />
             </div>
+            <div>
+                <FluentCombobox Label="Included Mentors"
+                                Placeholder="Select a Mentor"
+                                Multiple="true"
+                                TOption="string"
+                                TValue="string"
+                                Items="@mentorNames"
+                                
+                                @bind-SelectedItems="selectedMentorNames"
+                                @bind-SelectedItems:after="SetFilterItems" />
+            </div>
         </FluentStack>
     </FluentStack>
 
@@ -39,6 +50,9 @@
     private DateOnly? startDate;
     private DateOnly? endDate;
 
+    private List<string> mentorNames = default!;
+    private IEnumerable<string?> selectedMentorNames = default!;
+
     protected override void OnParametersSet()
     {
         Debug.Assert(AggregatedEmailData is not null);
@@ -48,6 +62,14 @@
         }
 
         _prevAggregatedEmailData = AggregatedEmailData;
+
+        mentorNames = AggregatedEmailData.ApprovedHoursEmails.Select(x => x.MentorName)
+                                        .Distinct(StringComparer.CurrentCultureIgnoreCase)
+                                        .Select(n => n.ToCapitaliseEachWord())
+                                        .Order()
+                                        .ToList();
+
+        selectedMentorNames = [.. mentorNames];
 
         SetFilterItems();
     }
@@ -67,6 +89,7 @@
         }
 
         items = approvedHoursEmails.GroupBy(x => x.MentorName, StringComparer.CurrentCultureIgnoreCase)
+            .Where(x => selectedMentorNames.Contains(x.Key, StringComparer.CurrentCultureIgnoreCase))
             .Select(x => new MentorStatistics(x, x.Key))
             .OrderBy(x => x.MentorName)
             .ToList()
