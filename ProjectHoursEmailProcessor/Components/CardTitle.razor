@@ -1,0 +1,15 @@
+﻿<div @attributes="Params">
+    <h2 style="margin-bottom:0px">@Title</h2>
+    <FluentDivider Appearance="dividerAppearance" />
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Title { get; set; }
+
+    [Parameter]
+    public DividerAppearance dividerAppearance { get; set; } = DividerAppearance.Brand;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object?>? Params { get; set; }
+}

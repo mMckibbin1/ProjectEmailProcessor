@@ -1,44 +1,67 @@
 ﻿@using System.Diagnostics
+@using System.Globalization
 
-<FluentCard>
-    <FluentStack Orientation="Orientation.Vertical">
-        <h2 style="margin-bottom:0px">Statistics</h2>
-        <FluentStack Orientation="Orientation.Horizontal" Wrap="true" HorizontalGap="8px">
-            <div>
-                <FluentDatePicker Label="Start Date"
-                                  @bind-Value="@startDate"
-                                  @bind-Value:after="SetFilterItems"
-                                  RenderStyle="DatePickerRenderStyle.Native" />
-            </div>
-            <div>
-                <FluentDatePicker Label="End Date"
-                                  @bind-Value="@endDate"
-                                  @bind-Value:after="SetFilterItems"
-                                  RenderStyle="DatePickerRenderStyle.Native" />
-            </div>
-            <div>
-                <FluentCombobox Label="Included Mentors"
-                                Placeholder="Select a Mentor"
-                                Multiple="true"
-                                TOption="string"
-                                TValue="string"
-                                Items="@mentorNames"
-                                
-                                @bind-SelectedItems="selectedMentorNames"
-                                @bind-SelectedItems:after="SetFilterItems" />
-            </div>
+<FluentStack Orientation="Orientation.Vertical" VerticalGap="8px" Class="@Margin.Bottom3">
+    <FluentCard>
+        <FluentStack Orientation="Orientation.Vertical">
+            <CardTitle Title="Statistics" />
+            <FluentStack Orientation="Orientation.Horizontal" Wrap="true" HorizontalGap="8px">
+                <div>
+                    <FluentDatePicker Label="Start Date"
+                                      @bind-Value="@startDate"
+                                      @bind-Value:after="SetFilterItems"
+                                      RenderStyle="DatePickerRenderStyle.Native" />
+                </div>
+                <div>
+                    <FluentDatePicker Label="End Date"
+                                      @bind-Value="@endDate"
+                                      @bind-Value:after="SetFilterItems"
+                                      RenderStyle="DatePickerRenderStyle.Native" />
+                </div>
+                <div>
+                    <FluentCombobox Label="Included Mentors"
+                                    Placeholder="Select a Mentor"
+                                    Multiple="true"
+                                    TOption="string"
+                                    TValue="string"
+                                    Items="@mentorNames"
+                                    @bind-SelectedItems="selectedMentorNames"
+                                    @bind-SelectedItems:after="SetFilterItems" />
+                </div>
+            </FluentStack>
         </FluentStack>
-    </FluentStack>
 
-    <FluentDataGrid Items="items" RowSize="DataGridRowSize.Small" StripedRows="true">
-        <PropertyColumn Property="p => p.MentorName" Title="Mentor Name" Sortable="true" IsDefaultSortColumn="true" />
-        <PropertyColumn Property="p => p.AverageSessionLength" Title="Average Session Length (Hours)" Sortable="true" />
-        <PropertyColumn Property="p => p.AverageSessionsPerBusiness" Title="Average Sessions Per Business" Sortable="true" />
-        <PropertyColumn Property="p => p.TotalNumberOfApprovedSessions" Title="Total Number Of Approved Sessions" Sortable="true" />
-        <PropertyColumn Property="p => p.TotalHoursApproved" Title="Total Hours Approved" Sortable="true" />
-        <PropertyColumn Property="p => p.NumberOfBusinesses" Title="Total Number Of Businesses" Sortable="true" />
-    </FluentDataGrid>
-</FluentCard>
+        <FluentDataGrid Items="items" RowSize="DataGridRowSize.Small" StripedRows="true">
+            <PropertyColumn Property="p => p.MentorName" Title="Mentor Name" Sortable="true" IsDefaultSortColumn="true" />
+            <PropertyColumn Property="p => p.AverageSessionLength" Title="Average Session Length (Hours)" Sortable="true" />
+            <PropertyColumn Property="p => p.AverageSessionsPerBusiness" Title="Average Sessions Per Business" Sortable="true" />
+            <PropertyColumn Property="p => p.TotalNumberOfApprovedSessions" Title="Total Number Of Approved Sessions" Sortable="true" />
+            <PropertyColumn Property="p => p.TotalHoursApproved" Title="Total Hours Approved" Sortable="true" />
+            <PropertyColumn Property="p => p.NumberOfBusinesses" Title="Total Number Of Businesses" Sortable="true" />
+        </FluentDataGrid>
+    </FluentCard>
+    <FluentCard>
+        <FluentStack Orientation="Orientation.Vertical" VerticalGap="8px">
+            <CardTitle Title="Monthly Stats" />
+            <FluentSelect Label="Included Mentors"
+                          Placeholder="Select a Mentor"
+                          TOption="int"
+                          TValue="int"
+                          Items="@years"
+                          @bind-value="selectedYear"
+                          @bind-value:after="SetFilterMonthStatistics" />
+            <FluentDataGrid Items="monthlyStatistics" RowSize="DataGridRowSize.Small" StripedRows="true">
+                <TemplateColumn Title="Month" Sortable="true" IsDefaultSortColumn="true" SortBy="monthSort">
+                    @context.MonthName
+                </TemplateColumn>
+                <PropertyColumn Property="p => p.TotalSessionsApproved" Title="Total Sessions Approved" Sortable="true" />
+                <PropertyColumn Property="p => p.TotalBusinessSupported" Title="Total Business Supported" Sortable="true" />
+                <PropertyColumn Property="p => p.TotalHoursApproved" Title="Total Hours Approved" Sortable="true" />
+                <PropertyColumn Property="p => p.AverageSessionLength" Title="Average Session Length" Sortable="true" />
+            </FluentDataGrid>
+        </FluentStack>
+    </FluentCard>
+</FluentStack>
 
 @code {
     [Parameter, EditorRequired]
@@ -46,12 +69,19 @@
     private AggregatedEmailData? _prevAggregatedEmailData;
 
     private IQueryable<MentorStatistics> items = default!;
+    private IQueryable<MonthlyStatistics> monthlyStatistics = default!;
+
+    private static readonly GridSort<MonthlyStatistics> monthSort = GridSort<MonthlyStatistics>.ByAscending(x => x.MonthNumber);
 
     private DateOnly? startDate;
     private DateOnly? endDate;
 
     private List<string> mentorNames = default!;
     private IEnumerable<string?> selectedMentorNames = default!;
+
+    private List<int> years = default!;
+    private int selectedYear;
+
 
     protected override void OnParametersSet()
     {
@@ -69,9 +99,18 @@
                                         .Order()
                                         .ToList();
 
+        years = AggregatedEmailData.ApprovedHoursEmails
+                    .Select(x => x.SessionDate.Year)
+                    .Distinct()
+                    .OrderDescending()
+                    .ToList();
+
+        selectedYear = years.FirstOrDefault();
+
         selectedMentorNames = [.. mentorNames];
 
         SetFilterItems();
+        SetFilterMonthStatistics();
     }
 
     private void SetFilterItems()
@@ -94,6 +133,17 @@
             .OrderBy(x => x.MentorName)
             .ToList()
             .AsQueryable();
+    }
+
+    private void SetFilterMonthStatistics()
+    {
+        var query = AggregatedEmailData.ApprovedHoursEmails.Where(x => x.SessionDate.Year == selectedYear);
+
+        monthlyStatistics = query.GroupBy(x => x.SessionDate.Month)
+                           .Select(x => new MonthlyStatistics(x.Key, x))
+                           .OrderBy(ms => ms.MonthNumber)
+                           .ToList()
+                           .AsQueryable();
     }
 
     private sealed class MentorStatistics
@@ -136,6 +186,57 @@
         {
             var average = aggregatedEmailData.Average(x => x.CompletedHours);
             return Math.Round(average, 1, MidpointRounding.AwayFromZero);
+        }
+    }
+
+    private sealed class MonthlyStatistics
+    {
+        private DateTimeFormatInfo dateTimeFormatInfo = new();
+        public int MonthNumber { get; private set; }
+
+        public IEnumerable<ApprovedHoursEmail> ApprovedHoursEmails { get; private set; }
+
+        public string MonthName => dateTimeFormatInfo.GetMonthName(MonthNumber);
+
+        public int TotalBusinessSupported { get; }
+        public int TotalSessionsApproved { get; }
+        public double TotalHoursApproved { get; }
+        public double AverageSessionLength { get; }
+
+        public MonthlyStatistics(int monthNumber, IEnumerable<ApprovedHoursEmail> approvedHoursEmails)
+        {
+            MonthNumber = monthNumber;
+            ApprovedHoursEmails = approvedHoursEmails;
+
+            TotalBusinessSupported = GetTotalBusinessSupported(ApprovedHoursEmails);
+            TotalSessionsApproved = GetTotalApprovedSessions(ApprovedHoursEmails);
+            TotalHoursApproved = GetTotalHoursApproved(ApprovedHoursEmails);
+            AverageSessionLength = GetTotalAverageSessionLength(ApprovedHoursEmails);
+        }
+
+        private static int GetTotalBusinessSupported(IEnumerable<ApprovedHoursEmail> approvedHoursEmails)
+        {
+            return approvedHoursEmails
+                    .DistinctBy(x => x.BusinessName, StringComparer.CurrentCultureIgnoreCase)
+                    .Count();
+        }
+
+        private static int GetTotalApprovedSessions(IEnumerable<ApprovedHoursEmail> approvedHoursEmails)
+        {
+            return approvedHoursEmails.Count();
+        }
+
+        private static double GetTotalHoursApproved(IEnumerable<ApprovedHoursEmail> approvedHoursEmails)
+        {
+            var sum = approvedHoursEmails.Sum(x => x.CompletedHours);
+            return Math.Round(sum, 1, MidpointRounding.AwayFromZero);
+        }
+
+        private static double GetTotalAverageSessionLength(IEnumerable<ApprovedHoursEmail> approvedHoursEmails)
+        {
+            var average = approvedHoursEmails.Average(x => x.CompletedHours);
+            return Math.Round(average, 1, MidpointRounding.AwayFromZero);
+
         }
     }
 }

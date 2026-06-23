@@ -42,8 +42,15 @@
                                       RenderStyle="DatePickerRenderStyle.Native" />
                 </div>
                 <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="8px">
-                    <FluentButton Type="ButtonType.Button" Disabled="disableSubmit" Appearance="ButtonAppearance.Primary" Loading="isFiltering" @onclick="Filter">Submit</FluentButton>
-                    <FluentButton Type="ButtonType.Button" Appearance="ButtonAppearance.Outline" Disabled="isFiltering" @onclick="RestFilter">Reset</FluentButton>
+                    <FluentButton Type="ButtonType.Button"
+                                  Disabled="disableSubmit" 
+                                  Appearance="ButtonAppearance.Primary"
+                                  Loading="isFiltering"
+                                  @onclick="Filter">Submit</FluentButton>
+                    <FluentButton Type="ButtonType.Button"
+                                  Appearance="ButtonAppearance.Outline"
+                                  Disabled="isFiltering"
+                                  @onclick="RestFilter">Reset</FluentButton>
                 </FluentStack>
             </FluentStack>
         </FluentCard>
