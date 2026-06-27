@@ -8,12 +8,12 @@
             <FluentStack Orientation="Orientation.Horizontal" Wrap="true" HorizontalGap="8px">
                 <div>
                     <FluentDatePicker Label="Start Date"
-                                      @bind-Value="@startDate"
+                                      @bind-Value="@mentorStartDate"
                                       @bind-Value:after="SetFilterItems" />
                 </div>
                 <div>
                     <FluentDatePicker Label="End Date"
-                                      @bind-Value="@endDate"
+                                      @bind-Value="@mentorEndDate"
                                       @bind-Value:after="SetFilterItems" />
                 </div>
                 <div>
@@ -29,7 +29,7 @@
             </FluentStack>
         </FluentStack>
 
-        <FluentDataGrid Items="items" RowSize="DataGridRowSize.Small" StripedRows="true">
+        <FluentDataGrid Items="mentorStatistics" RowSize="DataGridRowSize.Small" StripedRows="true">
             <PropertyColumn Property="p => p.MentorName" Title="Mentor Name" Sortable="true" IsDefaultSortColumn="true" />
             <PropertyColumn Property="p => p.AverageSessionLength" Title="Average Session Length (Hours)" Sortable="true" />
             <PropertyColumn Property="p => p.AverageSessionsPerBusiness" Title="Average Sessions Per Business" Sortable="true" />
@@ -46,11 +46,11 @@
                               Placeholder="Filter Type"
                               TOption="string"
                               TValue="string"
-                              Items="filterOptions"
-                              @bind-value="selectedFilter"
+                              Items="monthlyFilterOptions"
+                              @bind-value="selectedMonthlyFilter"
                               @bind-value:after="RestMothStatisticsFilter" />
 
-                @if (selectedFilter == "Yearly")
+                @if (selectedMonthlyFilter == "Yearly")
                 {
                     <FluentSelect Label="Year"
                                   Placeholder="Select a Year"
@@ -92,19 +92,19 @@
     public AggregatedEmailData AggregatedEmailData { get; set; }
     private AggregatedEmailData? _prevAggregatedEmailData;
 
-    private IQueryable<MentorStatistics> items = default!;
+    private IQueryable<MentorStatistics> mentorStatistics = default!;
     private IQueryable<MonthlyStatistics> monthlyStatistics = default!;
 
     private static readonly GridSort<MonthlyStatistics> monthSort = GridSort<MonthlyStatistics>.ByAscending(x => x.MonthNumber);
 
-    private DateOnly? startDate;
-    private DateOnly? endDate;
+    private DateOnly? mentorStartDate;
+    private DateOnly? mentorEndDate;
 
     private List<string> mentorNames = default!;
     private IEnumerable<string?> selectedMentorNames = default!;
 
-    private string[] filterOptions = ["Yearly", "Custom"];
-    private string selectedFilter = default!;
+    private static readonly string[] monthlyFilterOptions = ["Yearly", "Custom"];
+    private string selectedMonthlyFilter = default!;
 
     private List<int> years = default!;
     private int selectedYear;
@@ -114,7 +114,7 @@
 
     protected override void OnInitialized()
     {
-        selectedFilter = filterOptions[0];
+        selectedMonthlyFilter = monthlyFilterOptions[0];
     }
 
     protected override void OnParametersSet()
@@ -151,17 +151,17 @@
     {
         IEnumerable<ApprovedHoursEmail> approvedHoursEmails = AggregatedEmailData.ApprovedHoursEmails;
 
-        if (startDate.HasValue)
+        if (mentorStartDate.HasValue)
         {
-            approvedHoursEmails = approvedHoursEmails.Where(x => x.SessionDate >= startDate);
+            approvedHoursEmails = approvedHoursEmails.Where(x => x.SessionDate >= mentorStartDate);
         }
 
-        if (endDate.HasValue)
+        if (mentorEndDate.HasValue)
         {
-            approvedHoursEmails = approvedHoursEmails.Where(x => x.SessionDate <= endDate);
+            approvedHoursEmails = approvedHoursEmails.Where(x => x.SessionDate <= mentorEndDate);
         }
 
-        items = approvedHoursEmails.GroupBy(x => x.MentorName, StringComparer.CurrentCultureIgnoreCase)
+        mentorStatistics = approvedHoursEmails.GroupBy(x => x.MentorName, StringComparer.CurrentCultureIgnoreCase)
             .Where(x => selectedMentorNames.Contains(x.Key, StringComparer.CurrentCultureIgnoreCase))
             .Select(x => new MentorStatistics(x, x.Key))
             .OrderBy(x => x.MentorName)
@@ -173,7 +173,7 @@
     {
         DateRange dateRange;
 
-        if (selectedFilter == "Custom")
+        if (selectedMonthlyFilter == "Custom")
         {
             dateRange = new(monthlyStartDate, monthlyEndDate);
         }
