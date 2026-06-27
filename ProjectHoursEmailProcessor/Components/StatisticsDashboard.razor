@@ -9,14 +9,12 @@
                 <div>
                     <FluentDatePicker Label="Start Date"
                                       @bind-Value="@startDate"
-                                      @bind-Value:after="SetFilterItems"
-                                      RenderStyle="DatePickerRenderStyle.Native" />
+                                      @bind-Value:after="SetFilterItems" />
                 </div>
                 <div>
                     <FluentDatePicker Label="End Date"
                                       @bind-Value="@endDate"
-                                      @bind-Value:after="SetFilterItems"
-                                      RenderStyle="DatePickerRenderStyle.Native" />
+                                      @bind-Value:after="SetFilterItems" />
                 </div>
                 <div>
                     <FluentCombobox Label="Included Mentors"
@@ -43,13 +41,39 @@
     <FluentCard>
         <FluentStack Orientation="Orientation.Vertical" VerticalGap="8px">
             <CardTitle Title="Monthly Stats" />
-            <FluentSelect Label="Year"
-                          Placeholder="Select a Year"
-                          TOption="int"
-                          TValue="int"
-                          Items="@years"
-                          @bind-value="selectedYear"
-                          @bind-value:after="SetFilterMonthStatistics" />
+            <FluentStack Orientation="Orientation.Horizontal" Wrap="true" HorizontalGap="8px">
+                <FluentSelect Label="Filter Type"
+                              Placeholder="Filter Type"
+                              TOption="string"
+                              TValue="string"
+                              Items="filterOptions"
+                              @bind-value="selectedFilter"
+                              @bind-value:after="RestMothStatisticsFilter" />
+
+                @if (selectedFilter == "Yearly")
+                {
+                    <FluentSelect Label="Year"
+                                  Placeholder="Select a Year"
+                                  TOption="int"
+                                  TValue="int"
+                                  Items="years"
+                                  @bind-value="selectedYear"
+                                  @bind-value:after="SetFilterMonthStatistics" />
+                }
+                else
+                {
+                    <div>
+                        <FluentDatePicker Label="Start Date"
+                                          @bind-Value="monthlyStartDate"
+                                          @bind-Value:after="SetFilterMonthStatistics" />
+                    </div>
+                    <div>
+                        <FluentDatePicker Label="End Date"
+                                          @bind-Value="monthlyEndDate"
+                                          @bind-Value:after="SetFilterMonthStatistics" />
+                    </div>
+                }
+            </FluentStack>
             <FluentDataGrid Items="monthlyStatistics" RowSize="DataGridRowSize.Small" StripedRows="true">
                 <TemplateColumn Title="Month" Sortable="true" IsDefaultSortColumn="true" SortBy="monthSort">
                     @context.MonthName
@@ -79,9 +103,19 @@
     private List<string> mentorNames = default!;
     private IEnumerable<string?> selectedMentorNames = default!;
 
+    private string[] filterOptions = ["Yearly", "Custom"];
+    private string selectedFilter = default!;
+
     private List<int> years = default!;
     private int selectedYear;
 
+    private DateOnly? monthlyStartDate;
+    private DateOnly? monthlyEndDate;
+
+    protected override void OnInitialized()
+    {
+        selectedFilter = filterOptions[0];
+    }
 
     protected override void OnParametersSet()
     {
@@ -137,13 +171,32 @@
 
     private void SetFilterMonthStatistics()
     {
-        var query = AggregatedEmailData.ApprovedHoursEmails.Where(x => x.SessionDate.Year == selectedYear);
+        DateRange dateRange;
+
+        if (selectedFilter == "Custom")
+        {
+            dateRange = new(monthlyStartDate, monthlyEndDate);
+        }
+        else
+        {
+            dateRange = new(new DateOnly(selectedYear, 1, 1), new(selectedYear, 12, 31));
+        }
+
+        var query = AggregatedEmailData.ApprovedHoursEmails.Where(x => dateRange.Contains(x.SessionDate));
 
         monthlyStatistics = query.GroupBy(x => x.SessionDate.Month)
                            .Select(x => new MonthlyStatistics(x.Key, x))
                            .OrderBy(ms => ms.MonthNumber)
                            .ToList()
                            .AsQueryable();
+    }
+
+    private void RestMothStatisticsFilter()
+    {
+        monthlyStartDate = null;
+        monthlyEndDate = null;
+        selectedYear = years[0];
+        SetFilterMonthStatistics();
     }
 
     private sealed class MentorStatistics
@@ -191,7 +244,7 @@
 
     private sealed class MonthlyStatistics
     {
-        private DateTimeFormatInfo dateTimeFormatInfo = new();
+        private static readonly DateTimeFormatInfo dateTimeFormatInfo = new();
         public int MonthNumber { get; private set; }
 
         public IEnumerable<ApprovedHoursEmail> ApprovedHoursEmails { get; private set; }
@@ -237,6 +290,35 @@
             var average = approvedHoursEmails.Average(x => x.CompletedHours);
             return Math.Round(average, 1, MidpointRounding.AwayFromZero);
 
+        }
+    }
+
+    private readonly record struct DateRange
+    {
+        public DateOnly StartDate { get; }
+        public DateOnly EndDate { get; }
+
+        public DateRange() : this(null, null) { }
+
+        public DateRange(DateOnly? startDate, DateOnly? endDate)
+        {
+            if (startDate > endDate)
+            {
+                throw new ArgumentException("startDate must be before or equal to endDate");
+            }
+
+            if (endDate < startDate)
+            {
+                throw new ArgumentException("endDate must be greater or equal to startDate");
+            }
+
+            StartDate = startDate ?? DateOnly.MinValue;
+            EndDate = endDate ?? DateOnly.MaxValue;
+        }
+
+        public bool Contains(DateOnly date)
+        {
+            return date >= StartDate && date <= EndDate;
         }
     }
 }
